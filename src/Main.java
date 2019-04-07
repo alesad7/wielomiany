@@ -19,10 +19,10 @@ public class Main {
     }
 
     double reduce(double numerator, double denominator) {
-        double gcd = calculateGCD((int)numerator, (int)denominator);
+        double gcd = calculateGCD((int) numerator, (int) denominator);
         numerator /= gcd;
         denominator /= gcd;
-        return numerator/denominator;
+        return numerator / denominator;
     }
 
     private void getPolynomial() {
@@ -38,10 +38,6 @@ public class Main {
             factors.add(i, a);
         }
 
-        /*for(int i = 0; i < highestPower; i++){
-            System.out.println(factors.get(i));
-        }*/
-
         LM(factors);
     }
 
@@ -52,10 +48,8 @@ public class Main {
         List<Integer> M = new ArrayList<Integer>();
 
         Integer factorsSize = factors.size() - 1;
-        // System.out.println(factorsSize);
         for (int j = 1; j <= Math.abs(factors.get(factorsSize)); j++) {
             if (factors.get(factorsSize) % j == 0) {
-                //System.out.println("dzielnik wpolczynnika przy max potędze"+factors.get(factorsSize)/j);
                 m = factors.get(factorsSize) / j;
                 L.add(m);
                 L.add(-m);
@@ -63,9 +57,7 @@ public class Main {
         }
 
         for (int j = 1; j <= Math.abs(factors.get(0)); j++) {
-            //System.out.println(factors.get(i)/j);
             if (factors.get(0) % j == 0) {
-                //System.out.println("dzielnik wyrazu wolnego"+factors.get(0)/j);
                 l = factors.get(0) / j;
                 M.add(l);
                 M.add(-l);
@@ -75,8 +67,6 @@ public class Main {
     }
 
     public void factorsCandidates(List<Integer> L, List<Integer> M) {
-        System.out.println(L);
-        System.out.println(M);
 
         List<Double> factorsCandidates = new ArrayList<Double>();
         double factorCandidate;
@@ -88,11 +78,9 @@ public class Main {
             }
         }
 
-        //System.out.println(factorsCandidates);
         List<Double> listWithoutDuplicates = factorsCandidates.stream()
                 .distinct()
                 .collect(Collectors.toList());
-        System.out.println(listWithoutDuplicates);
 
         setUpCandidates(listWithoutDuplicates);
     }
@@ -104,18 +92,40 @@ public class Main {
             i = 0;
             summary = 0;
             for (int n = highestPower; n >= 0; n--) {
-            /*System.out.println(factors.get(i));
-            System.out.println(factors.get(i));
-            System.out.println(factors.get(i)*Math.pow(listWithoutDuplicates.get(1), n));*/
                 if (n != 0)
                     summary = summary + factors.get(i) * Math.pow(listWithoutDuplicates.get(m), n);
                 else summary = summary + factors.get(i);
-
-                //System.out.println(summary);
                 i++;
             }
-            System.out.println("SUMMARY FOR VALUE " + listWithoutDuplicates.get(m) + ": " + summary);
+            if (summary == 0) {
+                System.out.println("Pierwiastek " + listWithoutDuplicates.get(m) + " jest " + sprawdzKrotnoscPierwiastka(listWithoutDuplicates.get(m)) + " krotny");
+            }
         }
+    }
+
+    private int sprawdzKrotnoscPierwiastka(double pierwiastek) {
+        int krotnosc = 0;
+        double tmp;
+        List<Double> factorsTempList = new ArrayList<Double>();
+        List<Double> hornerTempList = new ArrayList<Double>();
+        hornerTempList.add((double) factors.get(0));
+        for (int i = 0; i < factors.size(); i++) {
+            factorsTempList.add(Double.valueOf(factors.get(i)));
+        }
+
+        do {
+            for (int i = 0; i < factors.size() - 1; i++) {
+                hornerTempList.add(hornerTempList.get(i) * pierwiastek + factorsTempList.get(i + 1));
+            }
+            tmp = hornerTempList.get(hornerTempList.size() - 1);
+            if (hornerTempList.get(hornerTempList.size() - 1) == 0) krotnosc = krotnosc + 1;
+            factorsTempList.clear();
+            factorsTempList = ((List) ((ArrayList) hornerTempList).clone());
+            hornerTempList.clear();
+            hornerTempList.add(factorsTempList.get(0));
+        } while (tmp == 0);
+
+        return krotnosc;
     }
 
     public static void main(String[] args) {
